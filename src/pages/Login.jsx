@@ -1,5 +1,21 @@
 import React, { useState } from 'react';
 
+// Cookie segédfüggvények
+const setCookie = (name, value, days = 7) => {
+  const expires = new Date();
+  expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+  document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Strict`;
+};
+
+export const getCookie = (name) => {
+  const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+  return match ? match[2] : null;
+};
+
+export const deleteCookie = (name) => {
+  document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;`;
+};
+
 const Login = ({ setIsLoginOpen, setIsAdmin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -7,11 +23,11 @@ const Login = ({ setIsLoginOpen, setIsAdmin }) => {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    // Csak az admin adatait fogadjuk el
     if (email === 'admin@1.hu' && password === 'admin123') {
       setIsAdmin(true);
       setIsLoginOpen(false);
       setError('');
+      setCookie('isAdmin', 'true', 7); // 7 napig marad bejelentkezve
     } else {
       setError('Hibás admin adatok!');
     }
@@ -21,7 +37,6 @@ const Login = ({ setIsLoginOpen, setIsAdmin }) => {
     <div style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0, 0, 0, 0.7)', backdropFilter: 'blur(8px)' }}>
       <div style={{ backgroundColor: 'white', width: '100%', maxWidth: '400px', padding: '40px', borderRadius: '24px', position: 'relative', border: '2px solid #000' }}>
         <button onClick={() => setIsLoginOpen(false)} style={{ position: 'absolute', top: '20px', right: '20px', border: 'none', background: 'none', fontSize: '20px', cursor: 'pointer', fontWeight: 'bold' }}>✕</button>
-
         <h2 style={{ textAlign: 'center', fontWeight: '900', marginBottom: '30px', textTransform: 'uppercase', letterSpacing: '1px' }}>Admin Belépés</h2>
         
         <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>

@@ -8,12 +8,13 @@ import AddCar from './pages/AddCar';
 import EditCar from './pages/EditCar';
 import CarDetails from './pages/CarDetails';
 import Footer from './components/Footer';
+import { getCookie, deleteCookie } from './pages/Login';
 
 function App() {
 
   const [currentPage, setCurrentPage] = useState('home'); 
   const [isLoginOpen, setIsLoginOpen] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(() => getCookie('isAdmin') === 'true'); // 🔥 cookie-ból indul
   
   const [selectedCar, setSelectedCar] = useState(null); 
   const [currentEditingCar, setCurrentEditingCar] = useState(null);
@@ -23,7 +24,6 @@ function App() {
   const [selectedFilter, setSelectedFilter] = useState("Összes autó");
   const [filterOpen, setFilterOpen] = useState(false);
 
-  // 🔥 KÜLÖN FÜGGVÉNY AZ AUTÓK BETÖLTÉSÉRE
   const fetchCars = async () => {
     try {
       const res = await fetch("http://192.168.12.102:3000/api/cars");
@@ -46,7 +46,6 @@ function App() {
     fetchCars();
   }, []);
 
-  // 🔥 BIZTOS FILTER (nem omlik össze)
   const filteredCars = Array.isArray(cars)
     ? cars.filter(car => {
         if (selectedFilter === "Összes autó") return true;
@@ -61,11 +60,18 @@ function App() {
           method: "DELETE"
         });
 
-        fetchCars(); // 🔥 újratöltés
+        fetchCars();
       } catch (err) {
         console.error("Törlési hiba:", err);
       }
     }
+  };
+
+  // 🔥 Kijelentkezés cookie törléssel
+  const handleLogout = () => {
+    setIsAdmin(false);
+    deleteCookie('isAdmin');
+    setCurrentPage('home');
   };
 
   const getNavStyle = (page) => ({
@@ -130,7 +136,7 @@ function App() {
             </button>
           ) : (
             <button
-              onClick={() => { setIsAdmin(false); setCurrentPage('home'); }}
+              onClick={handleLogout} // 🔥 cookie-t is törli
               style={{ backgroundColor: '#111', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer' }}
             >
               Kijelentkezés
@@ -175,7 +181,7 @@ function App() {
                   body: JSON.stringify(newCar)
                 });
 
-                await fetchCars(); // 🔥 STABIL MEGOLDÁS
+                await fetchCars();
                 setCurrentPage('admin');
 
               } catch (err) {

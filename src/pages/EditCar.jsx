@@ -5,22 +5,39 @@ const EditCar = ({ car, onSave, onCancel }) => {
   const [activeField, setActiveField] = useState(null);
   const [tempValue, setTempValue] = useState('');
   const [previewImg, setPreviewImg] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [savedField, setSavedField] = useState(null); // visszajelzéshez
 
-  // Szinkronizáljuk a helyi állapotot, ha a külső adat változik
   useEffect(() => {
     setFormData(car);
   }, [car]);
 
-  const saveField = (name, valueOverride = null) => {
+  const saveField = async (name, valueOverride = null) => {
     const finalValue = valueOverride !== null
       ? valueOverride
       : (name === 'price' || name === 'year') ? Number(tempValue) : tempValue;
 
     const updatedCar = { ...formData, [name]: finalValue };
-
-    // Azonnali mentés az adatbázisba, de az oldal nem vált el!
     setFormData(updatedCar);
-    onSave(updatedCar);
+
+    setSaving(true);
+    try {
+      const res = await fetch(`http://192.168.12.102:3000/api/cars/${car.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedCar)
+      });
+
+      if (!res.ok) throw new Error('Hiba a mentéskor');
+
+      setSavedField(name); // zöld visszajelzés
+      setTimeout(() => setSavedField(null), 2000);
+    } catch (err) {
+      console.error('Mentési hiba:', err);
+      alert('Hiba történt a mentés során!');
+    } finally {
+      setSaving(false);
+    }
 
     if (name === 'img') setPreviewImg(null);
     setActiveField(null);
@@ -30,14 +47,11 @@ const EditCar = ({ car, onSave, onCancel }) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewImg(reader.result);
-      };
+      reader.onloadend = () => setPreviewImg(reader.result);
       reader.readAsDataURL(file);
     }
   };
 
-  // Stílusok
   const rowStyle = { display: 'flex', alignItems: 'center', gap: '20px', padding: '20px 0', borderBottom: '1px solid #f0f0f0' };
   const labelStyle = { fontSize: '11px', fontWeight: '900', color: '#9ca3af', textTransform: 'uppercase', width: '130px' };
   const valueStyle = { fontSize: '16px', fontWeight: 'bold', color: '#111827', flex: 1 };
@@ -48,8 +62,10 @@ const EditCar = ({ car, onSave, onCancel }) => {
 
   const EditableRow = ({ label, name, type = "text", isSelect = false, options = [] }) => {
     const isEditing = activeField === name;
+    const justSaved = savedField === name;
+
     return (
-      <div style={rowStyle}>
+      <div style={{ ...rowStyle, backgroundColor: justSaved ? '#f0fdf4' : 'transparent', transition: 'background-color 0.3s', borderRadius: '8px' }}>
         <div style={labelStyle}>{label}</div>
         {isEditing ? (
           <>
@@ -60,15 +76,20 @@ const EditCar = ({ car, onSave, onCancel }) => {
             ) : (
               <input type={type} value={tempValue} onChange={(e) => setTempValue(e.target.value)} style={inputStyle} autoFocus />
             )}
-            <button onClick={() => saveField(name)} style={saveBtnStyle}>Mentés</button>
+            <button onClick={() => saveField(name)} style={saveBtnStyle} disabled={saving}>
+              {saving ? '...' : 'Mentés'}
+            </button>
             <button onClick={() => setActiveField(null)} style={cancelBtnStyle}>Mégse</button>
           </>
         ) : (
           <>
             <div style={valueStyle}>
-              {name === 'price' ? `${formData[name].toLocaleString()} Ft` : formData[name]}
+              {justSaved && <span style={{ color: '#10b981', fontSize: '12px', marginRight: '8px' }}>✓ Mentve</span>}
+              {name === 'price' ? `${Number(formData[name]).toLocaleString()} Ft` : formData[name]}
             </div>
-            <button onClick={() => { setActiveField(name); setTempValue(formData[name]); }} style={editBtnStyle}>Módosítás</button>
+            <button onClick={() => { setActiveField(name); setTempValue(formData[name]); }} style={editBtnStyle}>
+              Módosítás
+            </button>
           </>
         )}
       </div>
@@ -81,7 +102,7 @@ const EditCar = ({ car, onSave, onCancel }) => {
         <h2 style={{ fontSize: '28px', fontWeight: '900', marginBottom: '10px' }}>Autó szerkesztése</h2>
         <p style={{ color: '#9ca3af', fontSize: '14px', marginBottom: '30px' }}>A mentés után ezen az oldalon maradsz.</p>
 
-        {/* KÉP SZERKESZTÉS MEGERŐSÍTÉSSEL */}
+        {/* KÉP SZERKESZTÉS */}
         <div style={rowStyle}>
           <div style={labelStyle}>Borítókép</div>
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '15px' }}>
@@ -92,7 +113,9 @@ const EditCar = ({ car, onSave, onCancel }) => {
             />
             {previewImg && (
               <div style={{ display: 'flex', gap: '5px' }}>
-                <button onClick={() => saveField('img', previewImg)} style={saveBtnStyle}>Kép Mentése</button>
+                <button onClick={() => saveField('img', previewImg)} style={saveBtnStyle} disabled={saving}>
+                  {saving ? '...' : 'Kép Mentése'}
+                </button>
                 <button onClick={() => setPreviewImg(null)} style={cancelBtnStyle}>Mégse</button>
               </div>
             )}
@@ -114,12 +137,12 @@ const EditCar = ({ car, onSave, onCancel }) => {
         <EditableRow label="Váltó" name="gearbox" isSelect options={["Manuális", "Automata"]} />
         <EditableRow label="Csomagtér (L)" name="csomagter" />
         <EditableRow label="Tömeg (kg)" name="tomeg" />
-        <EditableRow label="Hajtás" name="hajtas" isSelect options={["Elsőkerék","Hátsókerék", "Összkerék"]} />
+        <EditableRow label="Hajtás" name="hajtas" isSelect options={["Elsőkerék", "Hátsókerék", "Összkerék"]} />
         <EditableRow label="Teljesítmény (LE)" name="teljesitmeny" />
 
         <div style={{ marginTop: '40px', borderTop: '2px solid #f3f4f6', paddingTop: '30px' }}>
           <button
-            onClick={onCancel}
+            onClick={onSave} // fetchCars() + visszanavigálás az App.jsx-ben
             style={{ width: '100%', backgroundColor: '#111', color: 'white', padding: '15px', borderRadius: '15px', border: 'none', fontWeight: 'bold', cursor: 'pointer' }}
           >
             Vissza az autók kezeléséhez (Kész vagyok)
