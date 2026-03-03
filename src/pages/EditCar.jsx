@@ -139,6 +139,7 @@ const EditCar = ({ car, onSave, onCancel }) => {
         <EditableRow label="Tömeg (kg)" name="tomeg" />
         <EditableRow label="Hajtás" name="hajtas" isSelect options={["Elsőkerék", "Hátsókerék", "Összkerék"]} />
         <EditableRow label="Teljesítmény (LE)" name="teljesitmeny" />
+        <EditableRow label="Leírás" name="description" />
 
         <div style={{ marginTop: '40px', borderTop: '2px solid #f3f4f6', paddingTop: '30px' }}>
           <button

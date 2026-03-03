@@ -188,6 +188,7 @@ const AddCar = ({ onSave, onCancel }) => {
               value={formData.csomagter}
               onChange={handleChange}
               style={inputStyle}
+              required
             />
           </div>
 
@@ -199,6 +200,7 @@ const AddCar = ({ onSave, onCancel }) => {
               value={formData.tomeg}
               onChange={handleChange}
               style={inputStyle}
+              required
             />
           </div>
         </div>
@@ -212,6 +214,7 @@ const AddCar = ({ onSave, onCancel }) => {
               value={formData.hajtas}
               onChange={handleChange}
               style={inputStyle}
+              required
             >
               <option>Elsőkerék</option>
               <option>Hátsókerék</option>
@@ -227,6 +230,7 @@ const AddCar = ({ onSave, onCancel }) => {
               value={formData.teljesitmeny}
               onChange={handleChange}
               style={inputStyle}
+              required
             />
           </div>
         </div>
@@ -237,6 +241,7 @@ const AddCar = ({ onSave, onCancel }) => {
           accept="image/*"
           onChange={handleFileChange}
           style={{ marginBottom: '20px' }}
+          required
         />
 
         <label style={labelStyle}>Leírás</label>
@@ -246,6 +251,7 @@ const AddCar = ({ onSave, onCancel }) => {
           onChange={handleChange}
           style={{ ...inputStyle, height: '120px' }}
           placeholder="Felszereltség, állapot..."
+          required
         />
 
         <div style={{ display: 'flex', gap: '15px', marginTop: '20px' }}>

@@ -186,7 +186,7 @@ const CarDetails = ({ car, onBack }) => {
           {descriptionText}
         </div>
 
-        {descriptionText.length > 200 && (
+        {descriptionText.length > 20 && (
           <button
             onClick={() => setExpanded(!expanded)}
             style={{
