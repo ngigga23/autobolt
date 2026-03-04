@@ -1,4 +1,5 @@
 import React from 'react';
+import { Fuel, Gauge, Settings2, Calendar } from 'lucide-react';
 
 const Home = ({ filteredCars, selectedFilter, setSelectedFilter, filterOpen, setFilterOpen, onDetailsClick }) => {
   return (
@@ -53,56 +54,53 @@ const Home = ({ filteredCars, selectedFilter, setSelectedFilter, filterOpen, set
               {car.status === 'Új autók' ? 'ÚJ' : 'HASZNÁLT'}
             </div>
 
-            <div style={{ height: '280px' }}>
-              <img src={car.img} alt={car.make} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            <div style={{ height: '280px', cursor: 'pointer' }} onClick={() => onDetailsClick(car)}>
+              <img src={car.img ? car.img.split('|||')[0] : ''} alt={car.make} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             </div>
 
             <div style={{ padding: '35px' }}>
               <h3 style={{ margin: '0 0 10px 0', fontSize: '28px', fontWeight: '900', color: '#111827' }}>
-              {car.make} - {car.year}
+                {car.make} - {car.year}
               </h3>
               <p style={{ color: '#9ca3af', fontSize: '14px', margin: '0 0 35px 0' }}>
                 Prémium minőségű választás az Ön igényeire szabva.
               </p>
 
-              {/* MINDEN TECHNIKAI ADAT IKONOKKAL */}
-              <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: '1fr 1fr', 
-                gap: '20px', 
-                marginBottom: '40px', 
-                borderTop: '1px solid #f3f4f6', 
-                paddingTop: '30px' 
-              }}>
+              {/* TECHNIKAI ADATOK IKONOKKAL */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '40px', borderTop: '1px solid #f3f4f6', paddingTop: '30px' }}>
+                
                 <div style={iconBoxStyle}>
-                  <span style={{fontSize: '20px'}}></span>
+                  <div style={iconCircleStyle}><Gauge size={16} color="#E31E24" /></div>
                   <div style={iconContentStyle}>
                     <span style={iconLabelStyle}>Kilométer</span>
                     <span style={iconTextStyle}>{car.km}</span>
                   </div>
                 </div>
+
                 <div style={iconBoxStyle}>
-                  <span style={{fontSize: '20px'}}></span>
+                  <div style={iconCircleStyle}><Fuel size={16} color="#E31E24" /></div>
                   <div style={iconContentStyle}>
                     <span style={iconLabelStyle}>Üzemanyag</span>
                     <span style={iconTextStyle}>{car.fuel}</span>
                   </div>
                 </div>
+
                 <div style={iconBoxStyle}>
-                  <span style={{fontSize: '20px'}}></span>
+                  <div style={iconCircleStyle}><Settings2 size={16} color="#E31E24" /></div>
                   <div style={iconContentStyle}>
                     <span style={iconLabelStyle}>Váltó</span>
                     <span style={iconTextStyle}>{car.gearbox}</span>
                   </div>
                 </div>
+
                 <div style={iconBoxStyle}>
-                  <span style={{fontSize: '20px'}}></span>
+                  <div style={iconCircleStyle}><Calendar size={16} color="#E31E24" /></div>
                   <div style={iconContentStyle}>
                     <span style={iconLabelStyle}>Évjárat</span>
                     <span style={iconTextStyle}>{car.year}</span>
                   </div>
                 </div>
-                
+
               </div>
 
               {/* ÁR ÉS GOMB */}
@@ -130,6 +128,7 @@ const Home = ({ filteredCars, selectedFilter, setSelectedFilter, filterOpen, set
 };
 
 const iconBoxStyle = { display: 'flex', alignItems: 'center', gap: '12px' };
+const iconCircleStyle = { width: '36px', height: '36px', borderRadius: '10px', backgroundColor: '#fff5f5', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 };
 const iconContentStyle = { display: 'flex', flexDirection: 'column' };
 const iconLabelStyle = { fontSize: '10px', color: '#9ca3af', fontWeight: 'bold', textTransform: 'uppercase' };
 const iconTextStyle = { fontSize: '13px', fontWeight: '800', color: '#111827' };

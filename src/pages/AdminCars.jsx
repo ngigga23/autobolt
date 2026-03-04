@@ -1,12 +1,9 @@
 import React from 'react';
-
-
 const AdminCars = ({ cars, deleteCar, onAddClick, onEditClick }) => {
   console.log(cars);
   
   const tableHeaderStyle = { padding: '15px 20px', fontSize: '12px', fontWeight: '900', textTransform: 'uppercase', color: '#374151', textAlign: 'left', borderBottom: '2px solid #f3f4f6' };
   const tableDataStyle = { padding: '15px 20px', fontSize: '14px', borderBottom: '1px solid #f3f4f6' };
-
   return (
     <div style={{ maxWidth: '1100px', margin: '40px auto', padding: '0 20px' }}>
       
@@ -14,12 +11,11 @@ const AdminCars = ({ cars, deleteCar, onAddClick, onEditClick }) => {
         <h1 style={{ fontSize: '32px', fontWeight: '900' }}>Autók kezelése</h1>
         <button 
           onClick={onAddClick}
-          style={{ backgroundColor: 'black', color: 'white', padding: '12px 25px', borderRadius: '12px', border: 'none', fontWeight: 'bold', cursor: 'pointer' }}
+          style={{ backgroundColor: 'green', color: 'white', padding: '12px 25px', borderRadius: '12px', border: 'none', fontWeight: 'bold', cursor: 'pointer' }}
         >
           + Új autó hozzáadása
         </button>
       </div>
-
       <div style={{ backgroundColor: 'white', borderRadius: '24px', overflow: 'hidden', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', border: '1px solid #f0f0f0' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
@@ -36,7 +32,7 @@ const AdminCars = ({ cars, deleteCar, onAddClick, onEditClick }) => {
               <tr key={car.id} style={{ transition: '0.2s' }}>
                 <td style={tableDataStyle}>#{car.id}</td>
                 <td style={tableDataStyle}>
-                  <img src={car.img} alt={car.make} style={{ width: '50px', height: '35px', borderRadius: '6px', objectFit: 'cover' }} />
+                  <img src={car.img ? car.img.split('|||')[0] : ''} alt={car.make} style={{ width: '50px', height: '35px', borderRadius: '6px', objectFit: 'cover' }} />
                 </td>
                 <td style={tableDataStyle}>
                   <div style={{ fontWeight: 'bold' }}>{car.make}</div>
@@ -65,5 +61,4 @@ const AdminCars = ({ cars, deleteCar, onAddClick, onEditClick }) => {
     </div>
   );
 };
-
 export default AdminCars;
